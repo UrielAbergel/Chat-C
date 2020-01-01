@@ -9,15 +9,14 @@
 #include <unistd.h>
 #include <stdio.h>
  
-/*
-void printsin(struct sockaddr_in *s, char *str1, char *str2) {
-  printf("%s\n", str1);
-  printf("%s: ", str2);
-  -- port: sin->sin_port (host integer type) 
-  -- IP: sin->sin_addr (IP in dotted-decimal notation) 
+void printsin(struct sockaddr_in *sin, char *pname, char* msg) {
+
+  printf("%s\n", pname);
+  printf("%s ", msg);
+  printf("ip= %s , port= %d", inet_ntoa(sin->sin_addr), sin->sin_port);
   printf("\n");
 }
-*/
+
  
 int main(int argc, char *argv[])
 {
