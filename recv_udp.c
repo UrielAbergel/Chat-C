@@ -25,6 +25,8 @@ int main(int argc, char *argv[])
   int socket_fd, cc, fsize;
  /*define struct that will be the socket*/
   struct sockaddr_in  s_in, from;
+  char servermessage[]="hello from server.";
+  char getmessage[256]={0};
    /*define struct that will be the the messege in the messenger*/
   struct { char head; u_long  body; char tail;} msg;
  
@@ -48,9 +50,12 @@ int main(int argc, char *argv[])
   for(;;) {
     fsize = sizeof(from);
      /*take the messege and put it in the messge storge */
-    cc = recvfrom(socket_fd,&msg,sizeof(msg),0,(struct sockaddr *)&from,&fsize);
+    cc = recvfrom(socket_fd,getmessage,sizeof(getmessage),0,(struct sockaddr *)&from,&fsize);
     //printsin( &from, "recv_udp: ", "Packet from:");
-    printf("Got data ::%c%ld%c\n",msg.head,(long) ntohl(msg.body),msg.tail); 
+    getmessage[cc]='\0';
+    printf("Client: %s",getmessage); 
+
+    sendto(socket_fd,servermessage,sizeof(servermessage),0,(struct sockaddr *)&from,fsize);
     fflush(stdout);
   }
    /*take a socket and connect it to the adress */
