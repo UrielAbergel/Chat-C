@@ -3,60 +3,58 @@
 #include <inttypes.h>
 #include <netdb.h>
 #include <sys/types.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <inttypes.h>
-#include <netdb.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <strings.h>
 #include <unistd.h>
+#include <string.h>
 #include <stdio.h>
-
+#define PORT_C 1235
+#define PORT_R 1233
 int main(int argc, char *argv[])
 {
-
-  /*make the socket id*/
-  int socket_fd;
-
-  /*make struct that will be the socket dest*/
-  struct sockaddr_in  dest;
-
-  struct hostent *hostptr;
-  char sendmessage[]="Hello from yair and uriel.";
-  char getmessage[256]={0};
-
-  struct { char head; u_long body; char tail; } msgbuf;
-
-/*make socket to do communication with the server*/
-  socket_fd = socket (AF_INET, SOCK_DGRAM, 0);
-
-  bzero((char *) &dest, sizeof(dest)); /* They say you must do this */
-
-  /*in argv[1] have the new host name take it and get the host by the name */
-  hostptr = gethostbyname(argv[1]);
-
-  /*take the adress and define it by the socket*/
-  dest.sin_family = (short) AF_INET;
-  bcopy(hostptr->h_addr, (char *)&dest.sin_addr,hostptr->h_length);
-  dest.sin_port = htons((u_short)0x3333);
+	char name[1024];
+	int socket_fd,cc, bin,length;
+    struct sockaddr_in serv_ad,dest;
+    struct hostent *hostptr;
+	socket_fd = socket (AF_INET, SOCK_DGRAM, 0);
+	memset((char *) &serv_ad,0,sizeof(serv_ad));
+    memset((char *) &dest,0,sizeof(dest));
+  	
+	serv_ad.sin_family-(short)AF_INET;
+	serv_ad.sin_addr.s_addr=(INADDR_ANY);
+	serv_ad.sin_port=PORT_C;
 
 
-/*make the messege that look like <msg>*/
-  msgbuf.head = '<';
-  msgbuf.body = htonl(getpid()); /* IMPORTANT! */
-  msgbuf.tail = '>';
+	dest.sin_family-(short)AF_INET;
+	dest.sin_addr.s_addr=(INADDR_ANY);
+	dest.sin_port=PORT_R;
 
-  int len = sizeof(dest);
-/* make a app that take the msg and send it by the socket dest*/
-  sendto(socket_fd,sendmessage,sizeof(sendmessage),0,(struct sockaddr *)&dest,len);
+	cc=bind(socket_fd,(struct sockaddr*) & serv_ad,sizeof(serv_ad));
+	
+	fflush(stdout);
+	
+	while(1)
+		{
+		bzero(name,1024);
+		fgets(name,1024,stdin);
 
-  int n =0;
-/*function that return the len of msg*/ 
-  n=recvfrom(socket_fd,getmessage,sizeof(getmessage),0,(struct sockaddr *)&dest,&len);
-  getmessage[n]='\0';
-  printf("Server : %s",getmessage);
+		if(strcmp(name,"exit\n")==0)
 
-  return 0;
+			{
+				strcpy(name,"connetion ended \n");
+				sendto(socket_fd,&name,1024,0,(struct sockaddr *)&dest,sizeof(dest));
+				
+				close(socket_fd);
+				break;
+			}
+
+		sendto(socket_fd,name,1024,0,(struct sockaddr *)&dest,sizeof(dest));
+		bzero(name,1024);
+		length=sizeof(dest);
+		recvfrom(socket_fd,name,1024,0,(struct sockaddr *)&dest,&length);
+		printf("%s\n",name);
+		fflush(stdout);
+		}
+		
+		return(0);
 }
-
