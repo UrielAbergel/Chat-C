@@ -1,7 +1,6 @@
 #include <sys/types.h>
 #include <netinet/in.h>
-#include <inttype
-"s.h>
+#include <inttypes.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sys/types.h>
@@ -12,7 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define PORT_C 1235 
+#define PORT_C 1235
 #define PORT_S 1234
 #define PORT_R 1233
 
